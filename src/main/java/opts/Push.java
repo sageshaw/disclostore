@@ -13,7 +13,6 @@ public class Push extends ActionableOption{
 
     public boolean execute(CommandLine cmd) {
 
-        System.out.println("I WILL PUSH YOU... someday :("); //TODO: implement push command
 
         return true;
     }

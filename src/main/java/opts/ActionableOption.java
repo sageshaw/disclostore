@@ -18,7 +18,7 @@ public abstract class ActionableOption {
         return opts;
     }
 
-    public abstract boolean execute(CommandLine cmd);
+    public abstract boolean execute(CommandLine cmd) throws Exception;
 
     public String getName() {
         return name;

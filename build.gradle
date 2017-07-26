@@ -32,4 +32,4 @@ run {
 }
 
 
-mainClassName = 'Gateway'
+mainClassName = 'exec.Gateway'
