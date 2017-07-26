@@ -1,16 +1,29 @@
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 
 import com.github.lalyos.jfiglet.FigletFont;
 
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.CipherException;
 
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthGetCode;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.utils.Numeric;
 import solids.Storage;
 
 //wallet passcode is 'manju'
@@ -61,18 +74,27 @@ public class Gateway {
         }
 
         try {
-            stor = Storage.load("0xc29002e61737Ab3337d365Db67200D09f141684f", web3, credentials,
-                    new BigInteger("999999", 10), new BigInteger("9999999", 10));
+            Function testAccess = new Function (
+                    "testInt",
+                    Arrays.<Type>asList(),
+                    Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
+            String encodedtest = FunctionEncoder.encode(testAccess);
+            org.web3j.protocol.core.methods.response.EthCall response = web3.ethCall(
+                    Transaction.createEthCallTransaction(credentials.getAddress(),"0xd51Ab18D5cFFBf8009733ee6969c0E7dEdC4d106", encodedtest),
+                    DefaultBlockParameterName.LATEST)
+                    .sendAsync().get();
+            List<Type> types = FunctionReturnDecoder.decode(response.getValue(), testAccess.getOutputParameters());
+            for (Type t : types) {
+                System.out.println(t.getValue());
+            }
+
         } catch (Exception e) {
             System.out.println("Couldn't find database! Make sure address is correct.");
             e.printStackTrace();
+            System.exit(4);
         } finally {
 
-            if (!stor.isValid()) {
-                System.out.println("Database not valid.");
 
-
-            }
         }
 
 
@@ -83,7 +105,7 @@ public class Gateway {
 
         System.out.println("\nHuzzah! You're connected. Here's your Ethereum client: " + clientVersion);
         System.out.println("Current wallet address: " + credentials.getAddress());
-        System.out.println("Connected to database: " + stor.isValid() + "\n");
+
 
 
 
