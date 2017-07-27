@@ -1,5 +1,6 @@
 package exec;
 
+
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
@@ -23,11 +24,10 @@ import java.util.concurrent.ExecutionException;
 
 public class Database {
 
+    public static final String DATABASE_ID = "300";
     private String address;
     private String sender;
     private String passkey;
-
-    public static final String DATABASE_ID = "300";
     private PersonalUnlockAccount account;
 
 
@@ -77,7 +77,8 @@ public class Database {
         Function function = new Function(
                 "verificationID",
                 Arrays.<Type>asList(),
-                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
+                Arrays. <TypeReference <?>>asList(new TypeReference <Uint256>() {
+                }));
 
         List<Type> returned = createSendCall(function);
 
@@ -115,19 +116,19 @@ public class Database {
         return true;
     }
 
-    public void setAddress(String contractAddress) {
-        address = contractAddress;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
     public String getAddress() {
         return address;
     }
 
+    public void setAddress(String contractAddress) {
+        address = contractAddress;
+    }
+
     public String getSender() {
         return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 }
