@@ -9,7 +9,6 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.parity.Parity;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 
 //wallet passcode is 'manju'
@@ -86,14 +85,6 @@ public class Gateway {
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
 
-
-        try {
-            storage.addProperty("ploof");
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
     }
 }
