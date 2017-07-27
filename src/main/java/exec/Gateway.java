@@ -85,6 +85,12 @@ public class Gateway {
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
 
+        try {
+            storage.addProperty("vorpal");
+            storage.addPropertyMetadata("vorpal", "ploof", "ploffed");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

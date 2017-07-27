@@ -14,6 +14,7 @@ import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.parity.methods.response.PersonalUnlockAccount;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +45,7 @@ public class Database {
         return account.accountUnlocked();
     }
 
-    private EthSendTransaction createSendTransaction(Function function) throws ExecutionException, InterruptedException {
+    private EthSendTransaction createSendTransaction(Function function) throws ExecutionException, InterruptedException, IOException {
 
         System.out.println("Account credentials loaded: " + isUnlocked());
 
@@ -83,7 +84,7 @@ public class Database {
         return returned.get(0).getValue().toString().equals(DATABASE_ID);
     }
 
-    public boolean addProperty(String propertyname) throws ExecutionException, InterruptedException { //TODO: implement ensure account unlock security feature
+    public boolean addProperty(String propertyname) throws ExecutionException, InterruptedException, IOException { //TODO: implement ensure account unlock security feature
 
         Utf8String _propertyName = new Utf8String(propertyname);
         Function function = new Function("addProperty", Arrays.<Type>asList(_propertyName),
@@ -91,11 +92,27 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Transaction hash: " + transactionResponse.getTransactionHash());
+        System.out.println("Property creation hash: " + transactionResponse.getTransactionHash());
+
 
         return true;
 
+    }
 
+    public boolean addPropertyMetadata(String propertyname, String key, String value) throws ExecutionException, InterruptedException, IOException {
+
+        Utf8String _propertyName = new Utf8String(propertyname);
+        Utf8String _key = new Utf8String(key);
+        Utf8String _value = new Utf8String(value);
+
+        Function function = new Function("addPropertyMetadata", Arrays.<Type>asList(_propertyName, _key, _value),
+                Collections.<TypeReference<?>>emptyList());
+
+        EthSendTransaction transactionResponse = createSendTransaction(function);
+
+        System.out.println("Property metadata hash: " + transactionResponse.getTransactionHash());
+
+        return true;
     }
 
     public void setAddress(String contractAddress) {
