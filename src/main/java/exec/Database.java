@@ -10,6 +10,7 @@ import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.parity.methods.response.PersonalUnlockAccount;
 
 import java.math.BigInteger;
@@ -42,6 +43,21 @@ public class Database {
         return account.accountUnlocked();
     }
 
+    private EthSendTransaction createSendTransaction(String encodedFunction) throws ExecutionException, InterruptedException {
+
+        System.out.println("Account credentials loaded: " + isUnlocked());
+        EthGetTransactionCount ethGetTransactionCount = Gateway.web3.ethGetTransactionCount(
+                sender, DefaultBlockParameterName.LATEST).sendAsync().get();
+        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+
+        Transaction transaction = Transaction.createFunctionCallTransaction(sender, nonce,
+                new BigInteger("200000", 10), new BigInteger("900000", 10),
+                address, encodedFunction);
+
+        return Gateway.web3.ethSendTransaction(transaction).sendAsync().get();
+    }
+
+
     public boolean testAccess() throws ExecutionException, InterruptedException { //TODO: implement ensure account unlock security feature
 
 
@@ -60,24 +76,13 @@ public class Database {
     }
 
     public boolean addProperty(String propertyname) throws ExecutionException, InterruptedException {
-        System.out.println("Account credentials loaded: " + isUnlocked());
 
         Utf8String _propertyName = new Utf8String(propertyname);
         Function function = new Function("addProperty", Arrays.<Type>asList(_propertyName),
                 Collections.<TypeReference<?>>emptyList());
         String encodedFunction = FunctionEncoder.encode(function);
 
-
-        EthGetTransactionCount ethGetTransactionCount = Gateway.web3.ethGetTransactionCount(
-                sender, DefaultBlockParameterName.LATEST).sendAsync().get();
-        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-
-        Transaction transaction = Transaction.createFunctionCallTransaction(sender, nonce,
-                new BigInteger("200000", 10), new BigInteger("900000", 10),
-                address, encodedFunction);
-
-        org.web3j.protocol.core.methods.response.EthSendTransaction transactionResponse =
-                Gateway.web3.ethSendTransaction(transaction).sendAsync().get();
+        EthSendTransaction transactionResponse = createSendTransaction(encodedFunction);
 
         System.out.println("Transaction hash: " + transactionResponse.getTransactionHash());
 
