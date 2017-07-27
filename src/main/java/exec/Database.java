@@ -10,6 +10,7 @@ import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.parity.methods.response.PersonalUnlockAccount;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -21,15 +22,29 @@ public class Database {
 
     private String address;
     private String sender;
-    public static final String DATABASE_ID = "300";
+    private String passkey;
 
-    public Database(String contractAddress, String walletAddress) {
+    public static final String DATABASE_ID = "300";
+    private PersonalUnlockAccount account;
+
+
+    public Database(String contractAddress, String walletAddress, String password) {
         sender = walletAddress;
         address = contractAddress;
+        passkey = password;
     }
 
+    private boolean isUnlocked() throws ExecutionException, InterruptedException {
+        if (account == null || !account.accountUnlocked()) {
+            account = Gateway.web3.personalUnlockAccount(sender, passkey).sendAsync().get();
+        }
 
-    public boolean testAccess() throws ExecutionException, InterruptedException {
+        return account.accountUnlocked();
+    }
+
+    public boolean testAccess() throws ExecutionException, InterruptedException { //TODO: implement ensure account unlock security feature
+
+
         Function function = new Function(
                 "verificationID",
                 Arrays.<Type>asList(),
@@ -45,6 +60,8 @@ public class Database {
     }
 
     public boolean addProperty(String propertyname) throws ExecutionException, InterruptedException {
+        System.out.println("Account credentials loaded: " + isUnlocked());
+
         Utf8String _propertyName = new Utf8String(propertyname);
         Function function = new Function("addProperty", Arrays.<Type>asList(_propertyName),
                 Collections.<TypeReference<?>>emptyList());

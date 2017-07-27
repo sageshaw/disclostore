@@ -4,17 +4,18 @@ import com.github.lalyos.jfiglet.FigletFont;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.parity.Parity;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 //wallet passcode is 'manju'
 public class Gateway {
 
-    public static Web3j web3;
+    public static Parity web3;
     public static Database storage;
     public static Credentials credentials;
 
@@ -35,7 +36,7 @@ public class Gateway {
 
 
         try {
-             web3 = Web3j.build(new HttpService("http://192.168.250.33:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
+            web3 = Parity.build(new HttpService("http://192.168.250.40:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
         } catch (Exception e) {
             System.out.println("Could not connect to specified RPC port.");
             e.printStackTrace();
@@ -63,7 +64,7 @@ public class Gateway {
             System.out.println("Current wallet address: " + credentials.getAddress());
         }
 
-        storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress());
+        storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
         int testInt = -1;
 
         try {
@@ -86,6 +87,13 @@ public class Gateway {
         cmdHandle.parseCommand(args);
 
 
+        try {
+            storage.addProperty("ploof");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 }

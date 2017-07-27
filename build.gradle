@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.web3j:core:2.2.2'
+    compile 'org.web3j:core:2.3.0'
     compile 'com.github.lalyos:jfiglet:0.0.8'
     compile 'io.reactivex.rxjava2:rxjava:2.1.1'
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'

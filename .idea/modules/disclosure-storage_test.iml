@@ -10,7 +10,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="disclosure-storage_main" />
-    <orderEntry type="library" name="Gradle: org.web3j:core:2.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.web3j:core:2.3.0" level="project" />
     <orderEntry type="library" name="Gradle: com.github.lalyos:jfiglet:0.0.8" level="project" />
     <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.9" level="project" />
