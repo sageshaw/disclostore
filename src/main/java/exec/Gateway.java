@@ -35,7 +35,7 @@ public class Gateway {
 
 
         try {
-            web3 = Parity.build(new HttpService("http://192.168.250.40:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
+            web3 = Parity.build(new HttpService("http://localhost:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
         } catch (Exception e) {
             System.out.println("Could not connect to specified RPC port.");
             e.printStackTrace();
@@ -54,7 +54,8 @@ public class Gateway {
         }
 
         try {
-            credentials =  WalletUtils.loadCredentials("manju", "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-07-25T21-58-33.423183300Z--cf556eb7a1aedb38b9252d32afeef61a44edd08b");
+            //credentials =  WalletUtils.loadCredentials("manju", "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-07-25T21-58-33.423183300Z--cf556eb7a1aedb38b9252d32afeef61a44edd08b");
+            credentials = WalletUtils.loadCredentials("manju", "C:/Users/seiji/AppData/Local/Temp/ethereum_dev_mode/keystore/UTC--2017-07-29T02-02-10.800784900Z--3af8cd4dc8c5c82d6cda39917d5d9568ea26b41d");
         } catch (Exception e) {
             System.out.println("Bugger. Can't access your wallet. Make sure you have the correct path and login credentials.");
             e.printStackTrace();
@@ -63,8 +64,9 @@ public class Gateway {
             System.out.println("Current wallet address: " + credentials.getAddress());
         }
 
-        storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
-        int testInt = -1;
+        //   storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
+        storage = new Database("0xF6C878C892Afe99f8B09f3E49cDC26d8794C809f", credentials.getAddress(), "manju");
+
 
         try {
             System.out.println("Accessing correct database: " + storage.testAccess());
