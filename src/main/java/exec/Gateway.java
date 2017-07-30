@@ -7,6 +7,7 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.parity.Parity;
+import rx.Subscription;
 
 import java.io.IOException;
 
@@ -33,7 +34,6 @@ public class Gateway {
         String clientVersion;
 
 
-
         try {
             web3 = Parity.build(new HttpService("http://localhost:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
         } catch (Exception e) {
@@ -43,8 +43,8 @@ public class Gateway {
         }
 
         try {
-             web3ClientVersion = web3.web3ClientVersion().send();
-        } catch (Exception e){
+            web3ClientVersion = web3.web3ClientVersion().send();
+        } catch (Exception e) {
             System.out.println("Could not connect to Ethereum client. Please make sure your client is running.");
             e.printStackTrace();
             System.exit(2);
@@ -87,6 +87,11 @@ public class Gateway {
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
 
-
+        try {
+            Subscription subscription = web3.transactionObservable().subscribe(tx -> System.out.println(
+                    "Completed transaction: " + tx.getHash()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

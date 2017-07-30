@@ -20,6 +20,7 @@ public class Commander {
         optionList.add(new PullAll());
         optionList.add(new PullOps());
         optionList.add(new AddProperty());
+        optionList.add(new AddPropertyMetadata());
 
         options = new Options();
         for (int i = 0; i < optionList.size(); i++) {

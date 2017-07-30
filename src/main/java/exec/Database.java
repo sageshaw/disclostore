@@ -93,7 +93,7 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Property creation hash: " + transactionResponse.getTransactionHash());
+        System.out.println("Property creation transaction hash: " + transactionResponse.getTransactionHash());
 
 
         return true;
@@ -111,7 +111,7 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Property metadata hash: " + transactionResponse.getTransactionHash());
+        System.out.println("Property metadata transaction hash: " + transactionResponse.getTransactionHash());
 
         return true;
     }

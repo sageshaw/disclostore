@@ -18,9 +18,9 @@ public class AddProperty extends ActionableOption {
 
     @Override
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
-        System.out.println("Creating property '" + cmd.getOptionValue("addproperty") + "'");
-        Gateway.storage.addProperty(cmd.getOptionValue("addproperty"));
-        Gateway.storage.addPropertyMetadata(cmd.getOptionValue("addproperty"), "creator", Gateway.credentials.getAddress());
+        System.out.println("Creating property '" + cmd.getOptionValue(name) + "'");
+        Gateway.storage.addProperty(cmd.getOptionValue(name));
+
 
         return true;
     }
