@@ -84,7 +84,7 @@ public class Gateway {
 
         EthFilter filter = new EthFilter(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST,
                 "0x40D08129aDEDd391c203900B6e785539cCC38785");
-        web3.ethLogObservable(filter).subscribe(log -> System.out.println(log.getTopics()));
+        web3.ethLogObservable(filter).subscribe(log -> System.out.println(log.getTransactionHash()));
 
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
