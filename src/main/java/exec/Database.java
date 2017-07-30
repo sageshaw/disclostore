@@ -82,6 +82,8 @@ public class Database {
 
         List<Type> returned = createSendCall(function);
 
+        if (returned.size() == 0) return false;
+
         return returned.get(0).getValue().toString().equals(DATABASE_ID);
     }
 

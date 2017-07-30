@@ -4,10 +4,11 @@ import com.github.lalyos.jfiglet.FigletFont;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.parity.Parity;
-import rx.Subscription;
 
 import java.io.IOException;
 
@@ -54,8 +55,7 @@ public class Gateway {
         }
 
         try {
-            //credentials =  WalletUtils.loadCredentials("manju", "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-07-25T21-58-33.423183300Z--cf556eb7a1aedb38b9252d32afeef61a44edd08b");
-            credentials = WalletUtils.loadCredentials("manju", "C:/Users/seiji/AppData/Local/Temp/ethereum_dev_mode/keystore/UTC--2017-07-29T02-02-10.800784900Z--3af8cd4dc8c5c82d6cda39917d5d9568ea26b41d");
+            credentials = WalletUtils.loadCredentials("manju", "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-07-25T21-58-33.423183300Z--cf556eb7a1aedb38b9252d32afeef61a44edd08b");
         } catch (Exception e) {
             System.out.println("Bugger. Can't access your wallet. Make sure you have the correct path and login credentials.");
             e.printStackTrace();
@@ -64,8 +64,7 @@ public class Gateway {
             System.out.println("Current wallet address: " + credentials.getAddress());
         }
 
-        //   storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
-        storage = new Database("0xF6C878C892Afe99f8B09f3E49cDC26d8794C809f", credentials.getAddress(), "manju");
+        storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
 
 
         try {
@@ -83,15 +82,13 @@ public class Gateway {
         assert credentials != null;
         assert web3 != null;
 
+        EthFilter filter = new EthFilter(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST,
+                "0x40D08129aDEDd391c203900B6e785539cCC38785");
+        web3.ethLogObservable(filter).subscribe(log -> System.out.println(log.getTopics()));
 
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
 
-        try {
-            Subscription subscription = web3.transactionObservable().subscribe(tx -> System.out.println(
-                    "Completed transaction: " + tx.getHash()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 }
