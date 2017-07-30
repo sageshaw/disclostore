@@ -1,6 +1,10 @@
 package opts;
 
+import exec.FileTools;
 import org.apache.commons.cli.CommandLine;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Push extends ActionableOption{
 
@@ -11,9 +15,11 @@ public class Push extends ActionableOption{
         hasArgs = true;
     }
 
-    public boolean execute(CommandLine cmd) {
+    public boolean execute(CommandLine cmd) throws IOException {
 
-        System.out.println("I'll push you... someday :(");
+        File file = new File(cmd.getOptionValue(name));
+        byte[][] data = FileTools.encodeFile(file);
+
 
         return true;
     }
