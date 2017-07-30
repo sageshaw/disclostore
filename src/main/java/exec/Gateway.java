@@ -4,8 +4,6 @@ import com.github.lalyos.jfiglet.FigletFont;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.protocol.parity.Parity;
@@ -82,9 +80,6 @@ public class Gateway {
         assert credentials != null;
         assert web3 != null;
 
-        EthFilter filter = new EthFilter(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST,
-                "0x40D08129aDEDd391c203900B6e785539cCC38785");
-        web3.ethLogObservable(filter).subscribe(log -> System.out.println(log.getTransactionHash()));
 
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);

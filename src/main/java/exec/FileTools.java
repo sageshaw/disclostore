@@ -7,17 +7,10 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 
-public class FileHandler {
+public class FileTools {
 
-    private String fileName;
-    private File file;
 
-    public FileHandler(String name, String path) {
-        file = new File(path);
-        fileName = name;
-    }
-
-    public byte[][] encodeFile() throws IOException {
+    public static byte[][] encodeFile(File file) throws IOException {
         System.out.println("Encoding and processing file...");
         byte[] encodedFile = Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
 
@@ -39,7 +32,7 @@ public class FileHandler {
         return segmentedFile;
     }
 
-    public File decodeFile(String name, byte[][] segmentedFile) throws IOException {
+    public static File decodeFile(String name, byte[][] segmentedFile) throws IOException {
         System.out.println("Reassembling file...");
         byte[] encodedFile = new byte[segmentedFile.length * 32];
         int btIndex = 0;

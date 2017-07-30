@@ -35,6 +35,7 @@ public class Database {
         sender = walletAddress;
         address = contractAddress;
         passkey = password;
+
     }
 
     private boolean isUnlocked() throws ExecutionException, InterruptedException {
@@ -44,6 +45,7 @@ public class Database {
 
         return account.accountUnlocked();
     }
+
 
     private EthSendTransaction createSendTransaction(Function function) throws ExecutionException, InterruptedException, IOException {
 
@@ -59,7 +61,9 @@ public class Database {
                 new BigInteger("200000", 10), new BigInteger("900000", 10),
                 address, encodedFunction);
 
+
         return Gateway.web3.ethSendTransaction(transaction).sendAsync().get();
+
     }
 
     private List<Type> createSendCall(Function function) throws ExecutionException, InterruptedException {
@@ -95,8 +99,7 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Property creation transaction hash: " + transactionResponse.getTransactionHash());
-
+        System.out.println("Finished adding property '" + propertyname + "'");
 
         return true;
 
