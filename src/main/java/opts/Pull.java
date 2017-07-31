@@ -22,18 +22,12 @@ public class Pull extends ActionableOption {
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
         //TODO: implement for other properties as well
 
-        byte[][] data = new byte[100000][32]; //TODO find a way to a more accurate array creation
+        //       byte[][] data = new byte[100000][32]; //TODO find a way to a more accurate array creation
 
-        int btSeg = 0;
 
-        do {
+        byte[] data = Gateway.storage.pullData();
 
-            data[btSeg] = Gateway.storage.pullData("123MainSt", "test", btSeg);
-            btSeg++;
-
-        } while (Gateway.storage.pullData("123 Main St", "test", btSeg) != null);
-
-        File file = FileTools.decodeFile("test.txt", data);
+        File file = FileTools.decodeFileRaw(cmd.getOptionValue(name), data);
 
 
         return true;

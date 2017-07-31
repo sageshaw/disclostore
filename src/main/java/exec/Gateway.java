@@ -62,7 +62,7 @@ public class Gateway {
             System.out.println("Current wallet address: " + credentials.getAddress());
         }
 
-        storage = new Database("0x40D08129aDEDd391c203900B6e785539cCC38785", credentials.getAddress(), "manju");
+        storage = new Database("0xBe075A4d4DF77D9A2d903b7031E4b318fEBFda09", credentials.getAddress(), "manju");
 
 
         try {
@@ -84,6 +84,7 @@ public class Gateway {
         cmdHandle = new Commander();
         cmdHandle.parseCommand(args);
 
+        System.out.println("\nExiting...");
 
     }
 }

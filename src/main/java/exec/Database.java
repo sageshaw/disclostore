@@ -4,9 +4,11 @@ package exec;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Bytes1;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -18,6 +20,7 @@ import org.web3j.protocol.parity.methods.response.PersonalUnlockAccount;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Database {
 
-    public static final String DATABASE_ID = "300";
+    public static final String DATABASE_ID = "0.0.5";
     private String address;
     private String sender;
     private String passkey;
@@ -50,7 +53,7 @@ public class Database {
 
     private EthSendTransaction createSendTransaction(Function function) throws ExecutionException, InterruptedException, IOException {
 
-        System.out.println("Account credentials loaded: " + isUnlocked());
+        this.isUnlocked();
 
         String encodedFunction = FunctionEncoder.encode(function);
 
@@ -59,7 +62,7 @@ public class Database {
         BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 
         Transaction transaction = Transaction.createFunctionCallTransaction(sender, nonce,
-                new BigInteger("200000", 10), new BigInteger("900000", 10),
+                new BigInteger("800000", 10), new BigInteger("900000", 10),
                 address, encodedFunction);
 
 
@@ -80,9 +83,9 @@ public class Database {
     public boolean testAccess() throws ExecutionException, InterruptedException {
 
         Function function = new Function(
-                "verificationID",
+                "version",
                 Arrays.<Type>asList(),
-                Arrays. <TypeReference <?>>asList(new TypeReference <Uint256>() {
+                Arrays. <TypeReference <?>>asList(new TypeReference <Utf8String>() {
                 }));
 
         List<Type> returned = createSendCall(function);
@@ -139,6 +142,57 @@ public class Database {
         return result.get(0).getValue().toString();
     }
 
+    /*=================== FOR TESTING PURPOSES ONLY TO SEE IF WE CAN STORE ARRAYS IN CONTRACTS====================== */
+    public boolean pushData(byte[] data) throws InterruptedException, ExecutionException, IOException {
+
+
+        Bytes1[] castedData = new Bytes1[data.length];
+        for (int i = 0; i < castedData.length; i++) castedData[i] = new Bytes1(new byte[]{data[i]});
+        DynamicArray <Bytes1> _data = new DynamicArray <Bytes1>(castedData);
+        Function function = new Function("uploadFile", Arrays. <Type>asList(_data),
+                Collections. <TypeReference <?>>emptyList());
+
+        EthSendTransaction transactionResponse = createSendTransaction(function);
+
+        System.out.print("Upload hash: " + transactionResponse.getTransactionHash());
+
+        return true;
+    }
+
+    public byte[] pullData() throws ExecutionException, InterruptedException {
+
+        Function function;
+        Uint256 param0 = new Uint256(0);
+        ArrayList <Byte> result = new ArrayList <Byte>();
+        List <Type> out;
+
+
+        while (true) {
+            function = new Function("data",
+                    Arrays. <Type>asList(param0),
+                    Arrays. <TypeReference <?>>asList(new TypeReference <Bytes1>() {
+                    }));
+            out = createSendCall(function);
+
+            if (out.size() == 0) break;
+
+            result.add(((Bytes1) out.get(0)).getValue()[0]);
+
+            param0 = new Uint256(param0.getValue().longValue() + 1);
+
+        }
+
+
+        byte[] data = new byte[result.size()];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = result.get(i).byteValue();
+        }
+
+        return data;
+    }
+
+
+    /*=============================== END OF TESTING ZONE=========================================================== */
     public boolean pushData(String propertyName, String fileName, byte[] data, int index) throws InterruptedException, ExecutionException, IOException {
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
@@ -150,7 +204,7 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println(fileName + " #" + index + ": " + transactionResponse.getTransactionHash());
+        System.out.println("Hash for " + fileName + " #" + index + ": " + transactionResponse.getTransactionHash());
 
         return true;
     }

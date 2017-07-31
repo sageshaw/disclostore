@@ -32,6 +32,10 @@ public class FileTools {
         return segmentedFile;
     }
 
+    public static byte[] encodeFileRaw(File file) throws IOException {
+        return Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
+    }
+
     public static File decodeFile(String name, byte[][] segmentedFile) throws IOException {
         System.out.println("Reassembling file...");
         byte[] encodedFile = new byte[segmentedFile.length * 32];
@@ -45,7 +49,23 @@ public class FileTools {
         }
 
         byte[] decodedFile = Base64.getUrlDecoder().decode(encodedFile);
-        File file = new File("C:/Users/seiji/devstuff/" + name + ".pdf");
+        File file = new File("C:/Users/seiji/devstuff/" + name);
+
+
+        FileOutputStream writer = new FileOutputStream(file);
+        writer.write(decodedFile);
+        writer.close();
+
+
+        return file;
+
+    }
+
+    public static File decodeFileRaw(String name, byte[] data) throws IOException {
+        System.out.println("Reassembling raw file...");
+        byte[] decodedFile = Base64.getUrlDecoder().decode(data);
+
+        File file = new File("C:/Users/seiji/devstuff/" + name);
 
 
         FileOutputStream writer = new FileOutputStream(file);

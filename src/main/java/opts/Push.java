@@ -22,10 +22,13 @@ public class Push extends ActionableOption{
         File file = new File(cmd.getOptionValue(name));
         byte[][] data = FileTools.encodeFile(file);
 
+        byte[] otherData = FileTools.encodeFileRaw(file);
 
-        for (int btSeg = 0; btSeg < data.length; btSeg++) {     //TODO implement for other properties as well
-            Gateway.storage.pushData("123MainSt", "test", data[btSeg], btSeg);
-        }
+        Gateway.storage.pushData(otherData);
+
+//        for (int btSeg = 0; btSeg < data.length; btSeg++) {     //TODO implement for other properties as well
+//            Gateway.storage.pushData("123MainSt", "test", data[btSeg], btSeg);
+//        }
 
 
         return true;

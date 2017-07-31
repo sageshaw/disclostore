@@ -17,8 +17,6 @@ public class Commander {
         optionList.add(new Help());
         optionList.add(new Push());
         optionList.add(new Pull());
-        optionList.add(new PullAll());
-        optionList.add(new PullOps());
         optionList.add(new AddProperty());
         optionList.add(new AddPropertyMetadata());
         optionList.add(new GetMetadata());
