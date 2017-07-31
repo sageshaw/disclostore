@@ -24,7 +24,7 @@ public class Push extends ActionableOption{
 
 
         for (int btSeg = 0; btSeg < data.length; btSeg++) {     //TODO implement for other properties as well
-            Gateway.storage.pushData("123 Main St", "test", data[btSeg], btSeg);
+            Gateway.storage.pushData("123MainSt", "test", data[btSeg], btSeg);
         }
 
 

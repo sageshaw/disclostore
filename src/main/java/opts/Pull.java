@@ -28,7 +28,7 @@ public class Pull extends ActionableOption {
 
         do {
 
-            data[btSeg] = Gateway.storage.pullData("123 Main St", "test", btSeg);
+            data[btSeg] = Gateway.storage.pullData("123MainSt", "test", btSeg);
             btSeg++;
 
         } while (Gateway.storage.pullData("123 Main St", "test", btSeg) != null);

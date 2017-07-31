@@ -34,7 +34,7 @@ public class Gateway {
 
 
         try {
-            web3 = Parity.build(new HttpService("http://localhost:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
+            web3 = Parity.build(new HttpService("http://192.168.250.39:8545")); //TODO: Allow user to specify RPC IP and Port (currently defaults to localhost:8545"
         } catch (Exception e) {
             System.out.println("Could not connect to specified RPC port.");
             e.printStackTrace();

@@ -21,6 +21,7 @@ public class Commander {
         optionList.add(new PullOps());
         optionList.add(new AddProperty());
         optionList.add(new AddPropertyMetadata());
+        optionList.add(new GetMetadata());
 
         options = new Options();
         for (int i = 0; i < optionList.size(); i++) {

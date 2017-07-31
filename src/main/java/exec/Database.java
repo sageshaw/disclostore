@@ -100,7 +100,9 @@ public class Database {
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Finished adding property '" + propertyName + "'");
+        System.out.println("Finished adding property '" + propertyName + "'\nTransaction Hash: "
+                + transactionResponse.getTransactionHash());
+
 
         return true;
 
@@ -120,6 +122,21 @@ public class Database {
         System.out.println("Property metadata transaction hash: " + transactionResponse.getTransactionHash());
 
         return true;
+    }
+
+    public String getPropertyMetadata(String propertyName, String key) throws ExecutionException, InterruptedException {
+
+        Utf8String _propertyName = new Utf8String(propertyName);
+        Utf8String _key = new Utf8String(key);
+
+        Function function = new Function("getPropertyMetadata",
+                Arrays. <Type>asList(_propertyName, _key),
+                Arrays. <TypeReference <?>>asList(new TypeReference <Utf8String>() {
+                }));
+
+        List <Type> result = createSendCall(function);
+
+        return result.get(0).getValue().toString();
     }
 
     public boolean pushData(String propertyName, String fileName, byte[] data, int index) throws InterruptedException, ExecutionException, IOException {
