@@ -7,6 +7,7 @@ import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
@@ -91,23 +92,23 @@ public class Database {
         return returned.get(0).getValue().toString().equals(DATABASE_ID);
     }
 
-    public boolean addProperty(String propertyname) throws ExecutionException, InterruptedException, IOException { //TODO: implement ensure account unlock security feature
+    public boolean addProperty(String propertyName) throws ExecutionException, InterruptedException, IOException { //TODO: implement ensure account unlock security feature
 
-        Utf8String _propertyName = new Utf8String(propertyname);
+        Utf8String _propertyName = new Utf8String(propertyName);
         Function function = new Function("addProperty", Arrays.<Type>asList(_propertyName),
                 Collections.<TypeReference<?>>emptyList());
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Finished adding property '" + propertyname + "'");
+        System.out.println("Finished adding property '" + propertyName + "'");
 
         return true;
 
     }
 
-    public boolean addPropertyMetadata(String propertyname, String key, String value) throws ExecutionException, InterruptedException, IOException {
+    public boolean addPropertyMetadata(String propertyName, String key, String value) throws ExecutionException, InterruptedException, IOException {
 
-        Utf8String _propertyName = new Utf8String(propertyname);
+        Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _key = new Utf8String(key);
         Utf8String _value = new Utf8String(value);
 
@@ -119,6 +120,38 @@ public class Database {
         System.out.println("Property metadata transaction hash: " + transactionResponse.getTransactionHash());
 
         return true;
+    }
+
+    public boolean pushData(String propertyName, String fileName, byte[] data, int index) throws InterruptedException, ExecutionException, IOException {
+        Utf8String _propertyName = new Utf8String(propertyName);
+        Utf8String _fileName = new Utf8String(fileName);
+        Bytes32 _data = new Bytes32(data);
+        Uint256 count = new Uint256(index);
+
+        Function function = new Function("uploadFile", Arrays. <Type>asList(_propertyName,
+                _fileName, _data, count), Collections. <TypeReference <?>>emptyList());
+
+        EthSendTransaction transactionResponse = createSendTransaction(function);
+
+        System.out.println(fileName + " #" + index + ": " + transactionResponse.getTransactionHash());
+
+        return true;
+    }
+
+    public byte[] pullData(String propertyName, String fileName, int index) throws ExecutionException, InterruptedException {
+
+        Utf8String _propertyName = new Utf8String(propertyName);
+        Utf8String _fileName = new Utf8String(fileName);
+        Uint256 count = new Uint256(index);
+
+        Function function = new Function("getFile",
+                Arrays. <Type>asList(_propertyName, _fileName, count),
+                Arrays. <TypeReference <?>>asList(new TypeReference <Bytes32>() {
+                }));
+
+        List <Type> returned = createSendCall(function);
+
+        return (byte[]) returned.get(0).getValue(); //TODO test to make sure this works
     }
 
     public String getAddress() {
