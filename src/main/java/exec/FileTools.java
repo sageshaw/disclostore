@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Base64;
 
-
+//Handles file encoding and decoding.
+//Files are read into a byte array and encoding with Base64 encoding. This is then
+//Outputted to the blockchain.
 public class FileTools {
 
-
+    //Legacy file conversion method. Outputs into two dimensional array of encoded file separated into 32 byte chunks.
+    //This is not how files are now stored, but included for use or regression to old storage method.
+    @Deprecated
     public static byte[][] encodeFile(File file) throws IOException {
         System.out.println("Encoding and processing file...");
         byte[] encodedFile = Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
@@ -32,10 +36,13 @@ public class FileTools {
         return segmentedFile;
     }
 
+    //Encodes file and base64 and returns byte array.
     public static byte[] encodeFileRaw(File file) throws IOException {
         return Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
     }
 
+    //Legacy decoding. See encodeFile for reasoning.
+    @Deprecated
     public static File decodeFile(String name, byte[][] segmentedFile) throws IOException {
         System.out.println("Reassembling file...");
         byte[] encodedFile = new byte[segmentedFile.length * 32];
@@ -61,6 +68,7 @@ public class FileTools {
 
     }
 
+    //Takes byte array, decodes Base64, and constructs new file and writes data to it. Returns file object for other use.
     public static File decodeFileRaw(String name, byte[] data) throws IOException {
         System.out.println("Reassembling raw file...");
         byte[] decodedFile = Base64.getUrlDecoder().decode(data);

@@ -20,16 +20,12 @@ public class Push extends ActionableOption{
     public boolean execute(CommandLine cmd) throws IOException, ExecutionException, InterruptedException {
 
         File file = new File(cmd.getOptionValue(name));
-        byte[][] data = FileTools.encodeFile(file);
 
         byte[] otherData = FileTools.encodeFileRaw(file);
 
         Gateway.storage.pushData(otherData);
-
-//        for (int btSeg = 0; btSeg < data.length; btSeg++) {     //TODO implement for other properties as well
-//            Gateway.storage.pushData("123MainSt", "test", data[btSeg], btSeg);
-//        }
-
+        //Note: current contract can only hold one File (only has one array). That's why there is no need to specify
+        //associated property.
 
         return true;
     }

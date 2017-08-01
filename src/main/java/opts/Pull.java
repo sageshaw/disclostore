@@ -28,6 +28,8 @@ public class Pull extends ActionableOption {
         byte[] data = Gateway.storage.pullData();
 
         File file = FileTools.decodeFileRaw(cmd.getOptionValue(name), data);
+        //Note: current contract can only hold one File (only has one array). That's why there is no need to specify
+        //associated property.
 
 
         return true;
