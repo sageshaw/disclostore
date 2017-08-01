@@ -39,7 +39,7 @@ public class Commander {
             result = parser.parse(options, args);
         } catch (Exception e) {
             e.printStackTrace();
-            //If there was an invalid argument, just print the help menu.
+            /* If there was an invalid argument, just print the help menu. */
             System.out.println("Bugger. Invalid args. Printing help menu.\n");
             new HelpFormatter().printHelp("disclostore", options); //TODO: Find a way to use help op instead
 
