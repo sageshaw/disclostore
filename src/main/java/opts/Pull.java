@@ -22,15 +22,12 @@ public class Pull extends ActionableOption {
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
         //TODO: implement for other properties as well
 
-        //       byte[][] data = new byte[100000][32]; //TODO find a way to a more accurate array creation
 
+        byte[][] data = Gateway.storage.pullData("123MainSt", "test");
 
-        byte[] data = Gateway.storage.pullData();
-
-        File file = FileTools.decodeFileRaw(cmd.getOptionValue(name), data);
+        File file = FileTools.decodeFile(cmd.getOptionValue(name), data);
         //Note: current contract can only hold one File (only has one array). That's why there is no need to specify
         //associated property.
-
 
         return true;
     }

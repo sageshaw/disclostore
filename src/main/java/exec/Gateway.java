@@ -25,7 +25,14 @@ public class Gateway {
     public static Database storage;         //instance of storage (abstracts transaction protocals even further from what web3j does)
     public static Credentials credentials;  //instance of user wallet to supply ether for transactions
 
+
+    private static final String CONTRACT_ADDRESS = "0xDdD002f6284205a2f574d878A8aF8351c6829c7c";
+    private static final String WALLET_PATH = "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-08-01T21-58-21.543584100Z--850aa5f9f0d776c51954d82b73f0e9c8d1cad6ef";
+    private static final String WALLET_PASS = "manju";
+    private static final String RPC_ADDRESS_PORT = "http://192.168.250.39:8545";
+
     public static void main(String[] args) throws IOException, CipherException {
+
 
         //Parses input and executes commands. Note: this program uses a half-baked command pattern to run.
         Commander cmdHandle;
@@ -43,7 +50,7 @@ public class Gateway {
         //TODO: make config file for user-specified ports and wallet locations (XML or JSON)
         //Establish connection with ethereum client via RPC. IPC is available, but this is more flexible.
         try {
-            web3 = Parity.build(new HttpService("http://192.168.250.39:8545")); //defaults to 'http://localhost:8545'
+            web3 = Parity.build(new HttpService(RPC_ADDRESS_PORT)); //defaults to 'http://localhost:8545'
         } catch (Exception e) {
             System.out.println("Could not connect to specified RPC port.");
             e.printStackTrace();
@@ -64,7 +71,7 @@ public class Gateway {
 
         //Load wallet utilities
         try {
-            credentials = WalletUtils.loadCredentials("manju", "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-07-25T21-58-33.423183300Z--cf556eb7a1aedb38b9252d32afeef61a44edd08b");
+            credentials = WalletUtils.loadCredentials(WALLET_PASS, WALLET_PATH);
         } catch (Exception e) {
             System.out.println("Bugger. Can't access your wallet. Make sure you have the correct path and login credentials.");
             e.printStackTrace();
@@ -74,7 +81,7 @@ public class Gateway {
         }
 
         //Instantiate database with provided contract address
-        storage = new Database("0xBe075A4d4DF77D9A2d903b7031E4b318fEBFda09", credentials.getAddress(), "manju");
+        storage = new Database(CONTRACT_ADDRESS, credentials.getAddress(), "manju");
 
         //Try to access and check version number (hardcoded into database). Good litmus test for blockchain connection.
         try {

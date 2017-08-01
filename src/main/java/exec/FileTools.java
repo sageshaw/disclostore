@@ -13,9 +13,9 @@ public class FileTools {
 
     //Legacy file conversion method. Outputs into two dimensional array of encoded file separated into 32 byte chunks.
     //This is not how files are now stored, but included for use or regression to old storage method.
-    @Deprecated
+
     public static byte[][] encodeFile(File file) throws IOException {
-        System.out.println("Encoding and processing file...");
+        System.out.println("Encoding and processing file '" + file.getName() + "'...");
         byte[] encodedFile = Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
 
         byte[][] segmentedFile = new byte[encodedFile.length / 32 + 1][32];
@@ -42,7 +42,7 @@ public class FileTools {
     }
 
     //Legacy decoding. See encodeFile for reasoning.
-    @Deprecated
+
     public static File decodeFile(String name, byte[][] segmentedFile) throws IOException {
         System.out.println("Reassembling file...");
         byte[] encodedFile = new byte[segmentedFile.length * 32];

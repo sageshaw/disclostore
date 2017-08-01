@@ -22,6 +22,7 @@ public class Commander {
         optionList.add(new AddProperty());
         optionList.add(new AddPropertyMetadata());
         optionList.add(new GetMetadata());
+        optionList.add(new AddFile());
 
         //Loop through list and add them to options object for use.
         options = new Options();

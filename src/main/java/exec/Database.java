@@ -67,23 +67,39 @@ public class Database {
         return account.accountUnlocked();
     }
 
-    //Factoring out the transaction protocol. Requires created function (no need for encoding) to work.
+    //Calculates nonce by grabbing number of transactions sent from an account and doing some crypto magic
+    private BigInteger calculateNonce() throws ExecutionException, InterruptedException {
+        EthGetTransactionCount ethGetTransactionCount = Gateway.web3.ethGetTransactionCount(
+                sender, DefaultBlockParameterName.LATEST).sendAsync().get();
+        return ethGetTransactionCount.getTransactionCount();
+
+    }
+
+    //Factoring out the transaction protocol. Requires created function (no need for encoding) to work. This automates
+    //nonce calculatioin
     private EthSendTransaction createSendTransaction(Function function) throws ExecutionException, InterruptedException, IOException {
+        this.isUnlocked();
+
+        //Calculate nonce
+        BigInteger nonce = calculateNonce();
+
+        return createSendTransaction(function, nonce);
+
+    }
+
+
+    //Factors out transaction protocal, but this time only expects nonce passed as BigInteger.
+    private EthSendTransaction createSendTransaction(Function function, BigInteger nonce) throws ExecutionException, InterruptedException, IOException {
         //Make sure we have privileges to account
         this.isUnlocked();
 
         //Encode function to bytecode to send
         String encodedFunction = FunctionEncoder.encode(function);
 
-        //Calculate nonce
-        EthGetTransactionCount ethGetTransactionCount = Gateway.web3.ethGetTransactionCount(
-                sender, DefaultBlockParameterName.LATEST).sendAsync().get();
-        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-
         //Create transaction (not send yet) using sender, nonce, and amount of gas requested and gas limit.
         //Geth/Parity signs the transaction with your account credentials here.
         Transaction transaction = Transaction.createFunctionCallTransaction(sender, nonce,
-                new BigInteger("800000", 10), new BigInteger("900000", 10),
+                new BigInteger("3000000", 10), new BigInteger("4000000", 10),
                 address, encodedFunction);
 
         //Send transaction and return the transaction response object.
@@ -111,8 +127,8 @@ public class Database {
         //Create new function, includes return type
         Function function = new Function(
                 "version",
-                Arrays.<Type>asList(),
-                Arrays. <TypeReference <?>>asList(new TypeReference <Utf8String>() {
+                Arrays.asList(),
+                Arrays.asList(new TypeReference <Utf8String>() {
                 }));
         //Obtain returned list (length should be one, with Utf8String)
         List<Type> returned = createSendCall(function);
@@ -132,8 +148,8 @@ public class Database {
         Utf8String _propertyName = new Utf8String(propertyName);
 
         //Create function
-        Function function = new Function("addProperty", Arrays.<Type>asList(_propertyName),
-                Collections.<TypeReference<?>>emptyList());
+        Function function = new Function("addProperty", Arrays.asList(_propertyName),
+                Collections.emptyList());
 
         //Send and obtain response object
         EthSendTransaction transactionResponse = createSendTransaction(function);
@@ -155,8 +171,8 @@ public class Database {
         Utf8String _key = new Utf8String(key);
         Utf8String _value = new Utf8String(value);
 
-        Function function = new Function("addPropertyMetadata", Arrays.<Type>asList(_propertyName, _key, _value),
-                Collections.<TypeReference<?>>emptyList());
+        Function function = new Function("addPropertyMetadata", Arrays.asList(_propertyName, _key, _value),
+                Collections.emptyList());
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
@@ -172,13 +188,28 @@ public class Database {
         Utf8String _key = new Utf8String(key);
 
         Function function = new Function("getPropertyMetadata",
-                Arrays. <Type>asList(_propertyName, _key),
-                Arrays. <TypeReference <?>>asList(new TypeReference <Utf8String>() {
+                Arrays.asList(_propertyName, _key),
+                Arrays.asList(new TypeReference <Utf8String>() {
                 }));
 
         List <Type> result = createSendCall(function);
 
         return result.get(0).getValue().toString();
+    }
+
+    public boolean addFile(String propertyName, String fileName) throws InterruptedException, ExecutionException, IOException {
+        Utf8String _propertyName = new Utf8String(propertyName);
+        Utf8String _fileName = new Utf8String(fileName);
+
+        Function function = new Function("addFile", Arrays.asList(_propertyName, _fileName),
+                Collections.emptyList());
+
+
+        EthSendTransaction transactionResponse = createSendTransaction(function);
+
+        System.out.println("File creation transaction hash: " + transactionResponse.getTransactionHash());
+
+        return true;
     }
 
     /*=================== FOR PROOF OF CONCEPT PURPOSES ONLY TO SEE IF WE CAN STORE ARRAYS IN CONTRACTS====================== */
@@ -188,12 +219,14 @@ public class Database {
         Bytes1[] castedData = new Bytes1[data.length];
         for (int i = 0; i < castedData.length; i++) castedData[i] = new Bytes1(new byte[]{data[i]});
         DynamicArray <Bytes1> _data = new DynamicArray <Bytes1>(castedData);
-        Function function = new Function("uploadFile", Arrays. <Type>asList(_data),
-                Collections. <TypeReference <?>>emptyList());
+        Function function = new Function("uploadFile", Arrays.asList(_data),
+                Collections.emptyList());
 
         EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.print("Upload hash: " + transactionResponse.getTransactionHash());
+
+        System.out.println("Upload size: " + castedData.length + "kB Upload hash: " + transactionResponse.getTransactionHash());
+        System.out.println(transactionResponse.getError().getMessage());
 
         return true;
     }
@@ -209,8 +242,8 @@ public class Database {
 
         while (true) {
             function = new Function("data",
-                    Arrays. <Type>asList(param0),
-                    Arrays. <TypeReference <?>>asList(new TypeReference <Bytes1>() {
+                    Arrays.asList(param0),
+                    Arrays.asList(new TypeReference <Bytes1>() {
                     }));
             out = createSendCall(function);
 
@@ -232,39 +265,65 @@ public class Database {
     }
     /*=============================== END OF TESTING ZONE=========================================================== */
     //Legacy pushData for old storage format when files were broken into 32 byte chunks and stored onto blockchain
-    @Deprecated
-    public boolean pushData(String propertyName, String fileName, byte[] data, int index) throws InterruptedException, ExecutionException, IOException {
+
+    public boolean pushData(String propertyName, String fileName, byte[][] data) throws InterruptedException, ExecutionException, IOException {
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
-        Bytes32 _data = new Bytes32(data);
-        Uint256 count = new Uint256(index);
+        Bytes32 _data;
+        Uint256 count;
 
-        Function function = new Function("uploadFile", Arrays. <Type>asList(_propertyName,
-                _fileName, _data, count), Collections. <TypeReference <?>>emptyList());
+        BigInteger nonce = calculateNonce();
 
-        EthSendTransaction transactionResponse = createSendTransaction(function);
 
-        System.out.println("Hash for " + fileName + " #" + index + ": " + transactionResponse.getTransactionHash());
+        for (int btSeg = 0; btSeg < data.length; btSeg++) {
+            count = new Uint256(btSeg);
+            _data = new Bytes32(data[btSeg]);
+            Function function = new Function("uploadFile", Arrays.asList(_propertyName,
+                    _fileName, _data, count), Collections.emptyList());
+
+            EthSendTransaction transactionResponse = createSendTransaction(function, nonce);
+            nonce = nonce.add(BigInteger.ONE);
+            System.out.println("Hash for " + fileName + " #" + btSeg + ": " + transactionResponse.getTransactionHash()
+                    + " Current nonce: " + nonce.toString());
+        }
 
         return true;
     }
 
     //Legacy pullData for old storage format. See pushData above.
-    @Deprecated
-    public byte[] pullData(String propertyName, String fileName, int index) throws ExecutionException, InterruptedException {
+
+    public byte[][] pullData(String propertyName, String fileName) throws ExecutionException, InterruptedException {
 
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
-        Uint256 count = new Uint256(index);
 
-        Function function = new Function("getFile",
-                Arrays. <Type>asList(_propertyName, _fileName, count),
-                Arrays. <TypeReference <?>>asList(new TypeReference <Bytes32>() {
-                }));
+        Uint256 count = new Uint256(0);
+        Function function;
+        ArrayList <byte[]> result = new ArrayList <byte[]>();
+        List <Type> out;
 
-        List <Type> returned = createSendCall(function);
+        while (true) {
+            function = new Function("getFile",
+                    Arrays.asList(_propertyName, _fileName, count),
+                    Arrays.asList(new TypeReference <Bytes32>() {
+                    }));
 
-        return (byte[]) returned.get(0).getValue(); //TODO test to make sure this works
+            out = createSendCall(function);
+
+            if (out.size() == 0) break;
+
+            result.add(((Bytes32) out.get(0)).getValue());
+
+            count = new Uint256(count.getValue().longValue() + 1);
+        }
+
+        byte[][] data = new byte[result.size()][32];
+
+        for (int btSeg = 0; btSeg < data.length; btSeg++) {
+            data[btSeg] = result.get(btSeg);
+        }
+
+        return data;
     }
 
 

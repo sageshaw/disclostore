@@ -21,11 +21,12 @@ public class Push extends ActionableOption{
 
         File file = new File(cmd.getOptionValue(name));
 
-        byte[] otherData = FileTools.encodeFileRaw(file);
+//        byte[] otherData = FileTools.encodeFileRaw(file);
+//
+//        Gateway.storage.pushData(otherData);
+        byte[][] data = FileTools.encodeFile(file);
 
-        Gateway.storage.pushData(otherData);
-        //Note: current contract can only hold one File (only has one array). That's why there is no need to specify
-        //associated property.
+        Gateway.storage.pushData("123MainSt", "test", data);
 
         return true;
     }
