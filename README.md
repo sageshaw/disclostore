@@ -1,3 +1,4 @@
 # disclostore
 
-User interface and pre-processing for proof-of-concept blockchain housing disclosure system (wrapped contract in solids package).
+This was originally developed as a proof-of-concept application to store 
+housing disclosures on an Ethereum blockchain using web3j. 
