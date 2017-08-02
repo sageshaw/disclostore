@@ -16,7 +16,7 @@ public class FileTools {
 
     public static byte[][] encodeFile(File file) throws IOException {
         System.out.println("Encoding and processing file '" + file.getName() + "'...");
-        byte[] encodedFile = Base64.getUrlEncoder().withoutPadding().encode(Files.readAllBytes(file.toPath()));
+        byte[] encodedFile = Base64.getMimeEncoder().encode(Files.readAllBytes(file.toPath()));
 
         byte[][] segmentedFile = new byte[encodedFile.length / 32 + 1][32];
 
@@ -74,7 +74,7 @@ public class FileTools {
 
 //        encodedFile = removeZeroPads(encodedFile);
 
-        byte[] decodedFile = Base64.getUrlDecoder().decode(encodedFile);
+        byte[] decodedFile = Base64.getMimeDecoder().decode(encodedFile);
         File file = new File("C:/Users/seiji/devstuff/" + name);
 
 
