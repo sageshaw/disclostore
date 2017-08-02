@@ -23,7 +23,7 @@ public class Pull extends ActionableOption {
         //TODO: implement for other properties as well
 
 
-        byte[][] data = Gateway.storage.pullData("123MainSt", "test");
+        byte[][] data = Gateway.storage.pullData("123MainSt", "ploof");
 
         File file = FileTools.decodeFile(cmd.getOptionValue(name), data);
         //Note: current contract can only hold one File (only has one array). That's why there is no need to specify

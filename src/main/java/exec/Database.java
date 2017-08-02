@@ -292,6 +292,14 @@ public class Database {
 
     //Legacy pullData for old storage format. See pushData above.
 
+    private boolean isEmpty(byte[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != 0) return false;
+        }
+
+        return true;
+    }
+
     public byte[][] pullData(String propertyName, String fileName) throws ExecutionException, InterruptedException {
 
         Utf8String _propertyName = new Utf8String(propertyName);
@@ -303,6 +311,8 @@ public class Database {
         List <Type> out;
 
         while (true) {
+
+
             function = new Function("getFile",
                     Arrays.asList(_propertyName, _fileName, count),
                     Arrays.asList(new TypeReference <Bytes32>() {
@@ -310,10 +320,10 @@ public class Database {
 
             out = createSendCall(function);
 
-            if (out.size() == 0) break;
+            if (out.size() == 0 || isEmpty(((Bytes32) out.get(0)).getValue())) break;
 
             result.add(((Bytes32) out.get(0)).getValue());
-
+            System.out.println("Grabbed segment #" + count.getValue().toString());
             count = new Uint256(count.getValue().longValue() + 1);
         }
 
