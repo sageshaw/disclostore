@@ -36,27 +36,7 @@ public class FileTools {
         return segmentedFile;
     }
 
-    //Encodes file and base64 and returns byte array.
-    public static byte[] encodeFileRaw(File file) throws IOException {
-        return Base64.getUrlEncoder().encode(Files.readAllBytes(file.toPath()));
-    }
 
-
-    //Removes zero padding created by encoding process
-    private static byte[] removeZeroPads(byte[] arr) {
-
-        int zIndex;
-        for (zIndex = arr.length - 1; arr[zIndex] == 0; zIndex--) ;
-
-        zIndex++;
-
-        byte[] result = new byte[zIndex + 1];
-
-        for (int i = 0; i < result.length; i++) result[i] = arr[i];
-
-        return result;
-
-    }
 
     //Legacy decoding. See encodeFile for reasoning.
 
@@ -71,8 +51,6 @@ public class FileTools {
                 btIndex++;
             }
         }
-
-//        encodedFile = removeZeroPads(encodedFile);
 
         byte[] decodedFile = Base64.getMimeDecoder().decode(encodedFile);
         File file = new File("C:/Users/seiji/devstuff/" + name);

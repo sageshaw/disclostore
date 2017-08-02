@@ -21,9 +21,6 @@ public class Push extends ActionableOption{
 
         File file = new File(cmd.getOptionValue(name));
 
-//        byte[] otherData = FileTools.encodeFileRaw(file);
-//
-//        Gateway.storage.pushData(otherData);
         byte[][] data = FileTools.encodeFile(file);
 
         Gateway.storage.pushData("123MainSt", "ploof", data);
