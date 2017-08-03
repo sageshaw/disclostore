@@ -29,7 +29,8 @@ public class Gateway {
     private static final String CONTRACT_ADDRESS = "0xDdD002f6284205a2f574d878A8aF8351c6829c7c";
     private static final String WALLET_PATH = "C:/Users/seiji/devstuff/devchain/keystore/UTC--2017-08-01T21-58-21.543584100Z--850aa5f9f0d776c51954d82b73f0e9c8d1cad6ef";
     private static final String WALLET_PASS = "manju";
-    private static final String RPC_ADDRESS_PORT = "http://192.168.250.39:8545";
+    //    private static final String RPC_ADDRESS_PORT = "http://192.168.250.39:8545";
+    private static final String RPC_ADDRESS_PORT = "http://localhost:8545";
 
     public static void main(String[] args) throws IOException, CipherException {
 

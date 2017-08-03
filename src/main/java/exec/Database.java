@@ -270,7 +270,10 @@ public class Database {
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
         Bytes32 _data;
-        Uint256 count;
+        Uint256 count = new Uint256(0);
+        EthSendTransaction transactionResponse;
+        byte[] terminateSeq = new byte[]{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
+
 
         BigInteger nonce = calculateNonce();
 
@@ -281,20 +284,35 @@ public class Database {
             Function function = new Function("uploadFile", Arrays.asList(_propertyName,
                     _fileName, _data, count), Collections.emptyList());
 
-            EthSendTransaction transactionResponse = createSendTransaction(function, nonce);
+            transactionResponse = createSendTransaction(function, nonce);
             nonce = nonce.add(BigInteger.ONE);
-            System.out.println("Hash for " + fileName + " #" + btSeg + ": " + transactionResponse.getTransactionHash()
+            System.out.println("Hash for " + fileName + " #" + btSeg + "/" + (data.length - 1) + ": "
+                    + transactionResponse.getTransactionHash()
                     + " Current nonce: " + nonce.toString());
+            if (transactionResponse.getTransactionHash() == null) {
+                System.out.println("A problem occured in the upload process.\nError: "
+                        + transactionResponse.getError().getMessage());
+                return false;
+            }
         }
+
+        count = new Uint256(count.getValue().longValue() + 1);
+        _data = new Bytes32(terminateSeq);
+        Function function = new Function("uploadFile", Arrays.asList(_propertyName,
+                _fileName, _data, count), Collections.emptyList());
+
+        transactionResponse = createSendTransaction(function, nonce);
+        System.out.println("Termination sequence hash: " + transactionResponse.getTransactionHash()
+                + " Current nonce: " + nonce.toString());
 
         return true;
     }
 
     //Legacy pullData for old storage format. See pushData above.
 
-    private boolean isEmpty(byte[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] != 0) return false;
+    private boolean isTerminating(byte[] arr) {
+        for (int i = 0; i < arr.length; i += 2) {
+            if (!(arr[i] == 1 && arr[i + 1] == 0)) return false;
         }
 
         return true;
@@ -320,7 +338,7 @@ public class Database {
 
             out = createSendCall(function);
 
-            if (out.size() == 0 || isEmpty(((Bytes32) out.get(0)).getValue())) break;
+            if (out.size() == 0 || isTerminating(((Bytes32) out.get(0)).getValue())) break;
 
             result.add(((Bytes32) out.get(0)).getValue());
             System.out.println("Grabbed segment #" + count.getValue().toString());
