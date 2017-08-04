@@ -53,7 +53,7 @@ public class FileTools {
         }
 
         byte[] decodedFile = Base64.getMimeDecoder().decode(encodedFile);
-        File file = new File("C:/Users/seiji/devstuff/" + name);
+        File file = new File(name);
 
 
         FileOutputStream writer = new FileOutputStream(file);
@@ -70,7 +70,7 @@ public class FileTools {
         System.out.println("Reassembling raw file...");
         byte[] decodedFile = Base64.getUrlDecoder().decode(data);
 
-        File file = new File("C:/Users/seiji/devstuff/" + name);
+        File file = new File(name);
 
 
         FileOutputStream writer = new FileOutputStream(file);

@@ -14,7 +14,7 @@ public class Pull extends ActionableOption {
     public Pull() {
         super();
         name = "pull";
-        description = "pull file from blockchain. parameter: assigned name at push";
+        description = "pull file from blockchain. parameter: directory for file to be started, including output filename and extension";
         hasArgs = true;
     }
 

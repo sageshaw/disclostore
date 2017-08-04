@@ -38,7 +38,7 @@ public class Gateway {
         //Parses input and executes commands. Note: this program uses a half-baked command pattern to run.
         Commander cmdHandle;
 
-        //Some fun ascii art For a nice title.
+        //Some fun ascii art for a nice title.
         String asciiTitle = FigletFont.convertOneLine("Disclostore");
         System.out.println(asciiTitle);
         System.out.println("Version Alpha 0.1\n");
