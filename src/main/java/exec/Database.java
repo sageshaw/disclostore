@@ -4,11 +4,9 @@ package exec;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.Bytes1;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -212,60 +210,6 @@ public class Database {
         return true;
     }
 
-    /*=================== FOR PROOF OF CONCEPT PURPOSES ONLY TO SEE IF WE CAN STORE ARRAYS IN CONTRACTS====================== */
-    public boolean pushData(byte[] data) throws InterruptedException, ExecutionException, IOException {
-
-
-        Bytes1[] castedData = new Bytes1[data.length];
-        for (int i = 0; i < castedData.length; i++) castedData[i] = new Bytes1(new byte[]{data[i]});
-        DynamicArray <Bytes1> _data = new DynamicArray <Bytes1>(castedData);
-        Function function = new Function("uploadFile", Arrays.asList(_data),
-                Collections.emptyList());
-
-        EthSendTransaction transactionResponse = createSendTransaction(function);
-
-
-        System.out.println("Upload size: " + castedData.length + "kB Upload hash: " + transactionResponse.getTransactionHash());
-        System.out.println(transactionResponse.getError().getMessage());
-
-        return true;
-    }
-
-
-    public byte[] pullData() throws ExecutionException, InterruptedException {
-
-        Function function;
-        Uint256 param0 = new Uint256(0);
-        ArrayList <Byte> result = new ArrayList <Byte>();
-        List <Type> out;
-
-
-        while (true) {
-            function = new Function("data",
-                    Arrays.asList(param0),
-                    Arrays.asList(new TypeReference <Bytes1>() {
-                    }));
-            out = createSendCall(function);
-
-            if (out.size() == 0) break;
-
-            result.add(((Bytes1) out.get(0)).getValue()[0]);
-
-            param0 = new Uint256(param0.getValue().longValue() + 1);
-
-        }
-
-
-        byte[] data = new byte[result.size()];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = result.get(i).byteValue();
-        }
-
-        return data;
-    }
-    /*=============================== END OF TESTING ZONE=========================================================== */
-    //Legacy pushData for old storage format when files were broken into 32 byte chunks and stored onto blockchain
-
     public boolean pushData(String propertyName, String fileName, byte[][] data) throws InterruptedException, ExecutionException, IOException {
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
@@ -285,10 +229,11 @@ public class Database {
                     _fileName, _data, count), Collections.emptyList());
 
             transactionResponse = createSendTransaction(function, nonce);
-            nonce = nonce.add(BigInteger.ONE);
             System.out.println("Hash for " + fileName + " #" + btSeg + "/" + (data.length - 1) + " to '" + propertyName + "': "
                     + transactionResponse.getTransactionHash()
                     + " Current nonce: " + nonce.toString());
+            nonce = nonce.add(BigInteger.ONE);
+
             if (transactionResponse.getTransactionHash() == null) {
                 System.out.println("A problem occured in the upload process.\nError: "
                         + transactionResponse.getError().getMessage());
@@ -347,7 +292,8 @@ public class Database {
             if (out.size() == 0 || isTerminating(((Bytes32) out.get(0)).getValue())) break;
 
             result.add(((Bytes32) out.get(0)).getValue());
-            System.out.println("Grabbed segment #" + count.getValue().toString());
+            System.out.println("Grabbed segment #" + count.getValue().toString() + " of " + fileName +
+                    " in '" + propertyName + "'");
             count = new Uint256(count.getValue().longValue() + 1);
         }
 

@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class Pull extends ActionableOption {
+public class Pull extends ExtraArgOption {
 
 
     public Pull() {
@@ -20,12 +20,15 @@ public class Pull extends ActionableOption {
 
     @Override
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
-        //TODO: implement for other properties as well
 
+        //TODO: implement property/file existence checks
 
-        byte[][] data = Gateway.storage.pullData("123MainSt", "ploof");
+        String property = getExtraArg("Enter property name: ");
+        String fileName = cmd.getOptionValue(name);
 
-        File file = FileTools.decodeFile(cmd.getOptionValue(name), data);
+        byte[][] data = Gateway.storage.pullData(property, fileName.substring(fileName.lastIndexOf("/") + 1));
+
+        File file = FileTools.decodeFile(fileName, data);
 
 
         return true;

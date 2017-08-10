@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class Push extends PropertyOption {
+public class Push extends ExtraArgOption {
 
     public Push() {
         super();
@@ -23,7 +23,7 @@ public class Push extends PropertyOption {
 
         byte[][] data = FileTools.encodeFile(file);
 
-        String property = getProperty();
+        String property = getExtraArg("Enter property name: ");
 
         Gateway.storage.pushData(property, file.getName(), data);
 

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 
-public class AddProperty extends PropertyOption {
+public class AddProperty extends ExtraArgOption {
 
     public AddProperty() {
         super();
