@@ -286,7 +286,7 @@ public class Database {
 
             transactionResponse = createSendTransaction(function, nonce);
             nonce = nonce.add(BigInteger.ONE);
-            System.out.println("Hash for " + fileName + " #" + btSeg + "/" + (data.length - 1) + ": "
+            System.out.println("Hash for " + fileName + " #" + btSeg + "/" + (data.length - 1) + " to '" + propertyName + "': "
                     + transactionResponse.getTransactionHash()
                     + " Current nonce: " + nonce.toString());
             if (transactionResponse.getTransactionHash() == null) {
@@ -304,6 +304,12 @@ public class Database {
         transactionResponse = createSendTransaction(function, nonce);
         System.out.println("Termination sequence hash: " + transactionResponse.getTransactionHash()
                 + " Current nonce: " + nonce.toString());
+
+        if (transactionResponse.getTransactionHash() == null) {
+            System.out.println("A problem occured in the upload process.\nError: "
+                    + transactionResponse.getError().getMessage());
+            return false;
+        }
 
         return true;
     }

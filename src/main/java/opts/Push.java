@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class Push extends ActionableOption{
+public class Push extends PropertyOption {
 
     public Push() {
         super();
@@ -23,7 +23,9 @@ public class Push extends ActionableOption{
 
         byte[][] data = FileTools.encodeFile(file);
 
-        Gateway.storage.pushData("123MainSt", "ploof", data);
+        String property = getProperty();
+
+        Gateway.storage.pushData(property, file.getName(), data);
 
         return true;
     }
