@@ -40,6 +40,9 @@ import java.util.concurrent.ExecutionException;
 public class Database {
 
     public static final String DATABASE_ID = "0.0.5";   //hard-coded version string to compare for correct database
+    private static final int MAX_TIMEOUT_COUNT = 500;       /*Number of empty 32 byte chunks that can be read before terminating
+                                                        file pull in event of reading incorrect file*/
+
     private String address;                             //address of contract
     private String sender;                              //address of etherbase account
     private String passkey;                             //password to etherbase account
@@ -285,6 +288,16 @@ public class Database {
         return true;
     }
 
+    //Checks if the current bytechunk is empty (to ensure we aren't pulling an incorrect file)
+    private boolean isEmpty(byte[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != 0) return false;
+        }
+
+        return true;
+    }
+
+
     //Takes data on blockchain and reads into multidimensional array (should be complete file
     //segmented into 32 byte chunks. Decoding will happen later in Pull.java
     public byte[][] pullData(String propertyName, String fileName) throws ExecutionException, InterruptedException {
@@ -297,6 +310,7 @@ public class Database {
         Function function;
         ArrayList <byte[]> result = new ArrayList <byte[]>();
         List <Type> out;
+        int timeOutCount = 0; //Variable to increment to ensure we aren't reading an incorrect file
 
         while (true) {
 
@@ -308,9 +322,23 @@ public class Database {
                     }));
             //Actually make call
             out = createSendCall(function);
-            //check for terminating sequence to terminate loop if necessary
-            if (out.size() == 0 || isTerminating(((Bytes32) out.get(0)).getValue())) break;
-            //if not, add data to byte array
+            //check for terminating sequence to terminate loop if necessary (use short-circuit to ensure we have an
+            //array to work with, if the array doesn't exit, file ends anyway)
+            //If there isn't a terminating sequence, check for empty chunk and increment timeoutcount
+            //If there are too many timeout chunks in a row, print error message and return array with -1
+            //If there isn't a terminating sequence and array isn't empty, then reset the timeout counter
+            if (out.size() == 0 || isTerminating(((Bytes32) out.get(0)).getValue())) {
+                break;
+            } else if (isEmpty(((Bytes32) out.get(0)).getValue())) {
+                timeOutCount++;
+                if (timeOutCount > MAX_TIMEOUT_COUNT) {
+                    System.out.println("Timeout - reading empty file. Ensure you are using correct file/property name");
+                    return new byte[][]{{-1}}; //Return multidimensional byte array with -1 to represent error
+                }
+            } else {
+                timeOutCount = 0;
+            }
+            //if everything checks out, add data to byte array
             result.add(((Bytes32) out.get(0)).getValue());
             //some logging to console
             System.out.println("Grabbed segment #" + count.getValue().toString() + " of " + fileName +

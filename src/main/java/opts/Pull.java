@@ -21,12 +21,14 @@ public class Pull extends ExtraArgOption {
     @Override
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
 
-        //TODO: implement property/file existence checks
 
         String property = getExtraArg("Enter property name: ");
         String fileName = cmd.getOptionValue(name);
 
         byte[][] data = Gateway.storage.pullData(property, fileName.substring(fileName.lastIndexOf("/") + 1));
+
+        //pullData will return a multidimensional array with -1 if error occured. Check and return false if necessary
+        if (data[0][0] < 0) return false;
 
         File file = FileTools.decodeFile(fileName, data);
 
