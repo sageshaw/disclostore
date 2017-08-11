@@ -18,8 +18,9 @@ public class AddProperty extends ExtraArgOption {
 
     @Override
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
-        System.out.println("Creating property '" + cmd.getOptionValue(name) + "'");
-        Gateway.storage.addProperty(cmd.getOptionValue(name));
+        String propertyName = cmd.getOptionValue(name).toUpperCase();
+        System.out.println("Creating property '" + propertyName + "'");
+        Gateway.storage.addProperty(propertyName);
 
 
         return true;

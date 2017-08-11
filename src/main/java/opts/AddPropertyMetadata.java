@@ -14,8 +14,10 @@ public class AddPropertyMetadata extends ActionableOption {
 
     @Override
     public boolean execute(CommandLine cmd) throws Exception {
-        System.out.println("Adding metadata to: '" + cmd.getOptionValue(name) + "'");
-        Gateway.storage.addPropertyMetadata(cmd.getOptionValue(name), "creator", Gateway.credentials.getAddress());
+        String propertyName = cmd.getOptionValue(name).toUpperCase();
+
+        System.out.println("Adding metadata to: '" + propertyName + "'");
+        Gateway.storage.addPropertyMetadata(propertyName, "creator", Gateway.credentials.getAddress());
         return true;
     }
 }

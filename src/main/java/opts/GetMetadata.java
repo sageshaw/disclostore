@@ -15,7 +15,7 @@ public class GetMetadata extends ActionableOption {
     @Override
     public boolean execute(CommandLine cmd) throws Exception {
 
-        String metadata = Gateway.storage.getPropertyMetadata(cmd.getOptionValue(name), "creator");
+        String metadata = Gateway.storage.getPropertyMetadata(cmd.getOptionValue(name).toUpperCase(), "creator");
 
         System.out.println("Creator metadata: " + metadata);
 
