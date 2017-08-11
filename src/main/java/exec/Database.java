@@ -210,30 +210,44 @@ public class Database {
         return true;
     }
 
+    //Takes file broken into 32 byte chunks and uploads to blockchain, and appends termination sequence at the end
     public boolean pushData(String propertyName, String fileName, byte[][] data) throws InterruptedException, ExecutionException, IOException {
+        //Wrap variables for solidity type conversion and variable setup
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
         Bytes32 _data;
         Uint256 count = new Uint256(0);
+
+        //sets up transaction pointer (so we don't throw away a reference between byte chunk uploads
         EthSendTransaction transactionResponse;
+
+        //The termination sequence
         byte[] terminateSeq = new byte[]{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
 
-
+        //Get initial nonce, we will calculate the rest on our own (speeds up transaction time and reduces
+        //the amount of work geth needs to handle
         BigInteger nonce = calculateNonce();
 
-
+        //Interate through chunked file, uploading 32 bytes at a time
         for (int btSeg = 0; btSeg < data.length; btSeg++) {
-            count = new Uint256(btSeg);
-            _data = new Bytes32(data[btSeg]);
+            //Wrap nth chunk into solidity types
+            count = new Uint256(btSeg); //The index of the 32 byte chunk
+            _data = new Bytes32(data[btSeg]); //The actual 32 byte chunk
+
+            //Creation function to wrap into solidity contract transaction
             Function function = new Function("uploadFile", Arrays.asList(_propertyName,
                     _fileName, _data, count), Collections.emptyList());
 
+            //Send transaction
             transactionResponse = createSendTransaction(function, nonce);
+
+            //Log to console for debugging (and for an idea of general progress)
             System.out.println("Hash for " + fileName + " #" + btSeg + "/" + (data.length - 1) + " to '" + propertyName + "': "
                     + transactionResponse.getTransactionHash()
                     + " Current nonce: " + nonce.toString());
             nonce = nonce.add(BigInteger.ONE);
 
+            //transaction response hash will be null if an error occured, stop process if this happens
             if (transactionResponse.getTransactionHash() == null) {
                 System.out.println("A problem occured in the upload process.\nError: "
                         + transactionResponse.getError().getMessage());
@@ -241,6 +255,7 @@ public class Database {
             }
         }
 
+        //append termination sequence, check for errors (same as contents of for loop above, but one last time)
         count = new Uint256(count.getValue().longValue() + 1);
         _data = new Bytes32(terminateSeq);
         Function function = new Function("uploadFile", Arrays.asList(_propertyName,
@@ -256,11 +271,12 @@ public class Database {
             return false;
         }
 
+        //Return if everything works!
+
         return true;
     }
 
-    //Legacy pullData for old storage format. See pushData above.
-
+    //Checks if current read bytechunk in 'pullData()' method is the terminating sequence (alternating 1's and 0's)
     private boolean isTerminating(byte[] arr) {
         for (int i = 0; i < arr.length; i += 2) {
             if (!(arr[i] == 1 && arr[i + 1] == 0)) return false;
@@ -269,35 +285,42 @@ public class Database {
         return true;
     }
 
+    //Takes data on blockchain and reads into multidimensional array (should be complete file
+    //segmented into 32 byte chunks. Decoding will happen later in Pull.java
     public byte[][] pullData(String propertyName, String fileName) throws ExecutionException, InterruptedException {
-
+        //Set up variables for wrapping into solidity types
         Utf8String _propertyName = new Utf8String(propertyName);
         Utf8String _fileName = new Utf8String(fileName);
+        Uint256 count = new Uint256(0); //Index of current byte chunk
 
-        Uint256 count = new Uint256(0);
+        //Setting up some references to use later (so we don't need to throw away current ones in between byte chunks)
         Function function;
         ArrayList <byte[]> result = new ArrayList <byte[]>();
         List <Type> out;
 
         while (true) {
 
-
+            //Set up function to read data from specified property, file, and nth byte chunk for wrapping into
+            //solidity call
             function = new Function("getFile",
                     Arrays.asList(_propertyName, _fileName, count),
                     Arrays.asList(new TypeReference <Bytes32>() {
                     }));
-
+            //Actually make call
             out = createSendCall(function);
-
+            //check for terminating sequence to terminate loop if necessary
             if (out.size() == 0 || isTerminating(((Bytes32) out.get(0)).getValue())) break;
-
+            //if not, add data to byte array
             result.add(((Bytes32) out.get(0)).getValue());
+            //some logging to console
             System.out.println("Grabbed segment #" + count.getValue().toString() + " of " + fileName +
                     " in '" + propertyName + "'");
             count = new Uint256(count.getValue().longValue() + 1);
         }
-
+        //convert solidity-wrapped array into regulary multi-dimensional java array, then return converted
+        //array
         byte[][] data = new byte[result.size()][32];
+
 
         for (int btSeg = 0; btSeg < data.length; btSeg++) {
             data[btSeg] = result.get(btSeg);
