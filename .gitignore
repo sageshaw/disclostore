@@ -78,3 +78,4 @@ build/classes/main/store/
 build/tmp/compileJava/
 src/main/resources/
 src/test/
+/build/
