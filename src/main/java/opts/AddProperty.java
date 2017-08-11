@@ -12,7 +12,7 @@ public class AddProperty extends ExtraArgOption {
     public AddProperty() {
         super();
         name = "addproperty";
-        description = "add property to the database."; //TODO: enable security feature to prevent overwriting
+        description = "add property to the database. This will overwrite any existing property with the same name";
         hasArgs = true;
     }
 

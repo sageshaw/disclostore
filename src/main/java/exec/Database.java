@@ -141,7 +141,7 @@ public class Database {
     //Abstracts adding property function. Requires property name. This will allocate space on the blockchain
     //for a new property.
     //If called twice with same parameter, property is overwritten
-    public boolean addProperty(String propertyName) throws ExecutionException, InterruptedException, IOException { //TODO: implement ensure account unlock security feature
+    public boolean addProperty(String propertyName) throws ExecutionException, InterruptedException, IOException {
         //Wrap for Solidity type conversion
         Utf8String _propertyName = new Utf8String(propertyName);
 
