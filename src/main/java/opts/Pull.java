@@ -1,7 +1,7 @@
 package opts;
 
+import exec.Database;
 import exec.FileTools;
-import exec.Gateway;
 import org.apache.commons.cli.CommandLine;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class Pull extends ExtraArgOption {
         String property = getExtraArg("Enter property name: ");
         String fileName = cmd.getOptionValue(name);
 
-        byte[][] data = Gateway.storage.pullData(property, fileName.substring(fileName.lastIndexOf("/") + 1));
+        byte[][] data = Database.getInstance().pullData(property, fileName.substring(fileName.lastIndexOf("/") + 1));
 
         //pullData will return a multidimensional array with -1 if error occured. Check and return false if necessary
         if (data[0][0] < 0) return false;

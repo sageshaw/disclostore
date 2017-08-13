@@ -1,6 +1,6 @@
 package opts;
 
-import exec.Gateway;
+import exec.Database;
 import org.apache.commons.cli.CommandLine;
 
 public class GetMetadata extends ActionableOption {
@@ -15,7 +15,7 @@ public class GetMetadata extends ActionableOption {
     @Override
     public boolean execute(CommandLine cmd) throws Exception {
 
-        String metadata = Gateway.storage.getPropertyMetadata(cmd.getOptionValue(name).toUpperCase(), "creator");
+        String metadata = Database.getInstance().getPropertyMetadata(cmd.getOptionValue(name).toUpperCase(), "creator");
 
         System.out.println("Creator metadata: " + metadata);
 

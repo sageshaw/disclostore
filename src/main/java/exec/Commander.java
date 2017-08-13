@@ -42,7 +42,7 @@ public class Commander {
             e.printStackTrace();
             /* If there was an invalid argument, just print the help menu. */
             System.out.println("Bugger. Invalid args. Printing help menu.\n");
-            new HelpFormatter().printHelp("disclostore", options); //TODO: Find a way to use help op instead
+            new HelpFormatter().printHelp("disclostore", options); //TODO: Find a way to use help op instead (new design pattern?)
 
         }
 

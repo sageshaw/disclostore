@@ -37,6 +37,9 @@ import java.util.concurrent.ExecutionException;
 //This need a string with the corresponding contract function name, an array of Solidity types to specify input parameters,
 //and array of Solidity types (usually length one) for returned values.
 
+//Last note: this class is instantiated with a "non-lazy" Singleton pattern, since we need functionality on
+//program startup. This may change, but for now, it is what it is.
+
 public class Database {
 
     public static final String DATABASE_ID = "0.0.5";   //hard-coded version string to compare for correct database
@@ -48,7 +51,16 @@ public class Database {
     private String passkey;                             //password to etherbase account
     private PersonalUnlockAccount account;              //instance of accountUnlocker to make sure we have privelage to use account
 
+    private static Database storage = new Database();
 
+    public static synchronized Database getInstance() {
+        return storage;
+    }
+
+    private Database() {
+    }
+
+    @Deprecated
     public Database(String contractAddress, String walletAddress, String password) {
         sender = walletAddress;
         address = contractAddress;
@@ -373,5 +385,9 @@ public class Database {
 
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public void setPasskey(String code) {
+        passkey = code;
     }
 }

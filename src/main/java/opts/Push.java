@@ -1,7 +1,7 @@
 package opts;
 
+import exec.Database;
 import exec.FileTools;
-import exec.Gateway;
 import org.apache.commons.cli.CommandLine;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class Push extends ExtraArgOption {
 
         String property = getExtraArg("Enter property name: ");
 
-        Gateway.storage.pushData(property, file.getName(), data);
+        Database.getInstance().pushData(property, file.getName(), data);
 
         return true;
     }

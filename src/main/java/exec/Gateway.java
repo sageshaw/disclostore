@@ -22,7 +22,7 @@ public class Gateway {
 
     //Instanced that need to be accessible to all other classes
     public static Parity web3;              //instance of web3j used to communicate with Ethereum client (must be geth OR parity)
-    public static Database storage;         //instance of storage (abstracts transaction protocals even further from what web3j does)
+
     public static Credentials credentials;  //instance of user wallet to supply ether for transactions
 
 
@@ -81,12 +81,14 @@ public class Gateway {
             System.out.println("Current wallet address: " + credentials.getAddress());
         }
 
-        //Instantiate database with provided contract address
-        storage = new Database(CONTRACT_ADDRESS, credentials.getAddress(), "manju");
+        //Feed database correct parameters
+        Database.getInstance().setAddress(CONTRACT_ADDRESS);
+        Database.getInstance().setPasskey(WALLET_PASS);
+        Database.getInstance().setSender(credentials.getAddress());
 
         //Try to access and check version number (hardcoded into database). Good litmus test for blockchain connection.
         try {
-            System.out.println("Accessing correct database: " + storage.testAccess());
+            System.out.println("Accessing correct database: " + Database.getInstance().testAccess());
 
         } catch (Exception e) {
             System.out.println("Couldn't find database! Make sure address is correct.");

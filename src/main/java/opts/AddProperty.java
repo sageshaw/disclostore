@@ -1,6 +1,6 @@
 package opts;
 
-import exec.Gateway;
+import exec.Database;
 import org.apache.commons.cli.CommandLine;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class AddProperty extends ExtraArgOption {
     public boolean execute(CommandLine cmd) throws ExecutionException, InterruptedException, IOException {
         String propertyName = cmd.getOptionValue(name).toUpperCase();
         System.out.println("Creating property '" + propertyName + "'");
-        Gateway.storage.addProperty(propertyName);
+        Database.getInstance().addProperty(propertyName);
 
 
         return true;

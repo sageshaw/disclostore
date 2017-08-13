@@ -1,5 +1,6 @@
 package opts;
 
+import exec.Database;
 import exec.Gateway;
 import org.apache.commons.cli.CommandLine;
 
@@ -17,7 +18,7 @@ public class AddPropertyMetadata extends ActionableOption {
         String propertyName = cmd.getOptionValue(name).toUpperCase();
 
         System.out.println("Adding metadata to: '" + propertyName + "'");
-        Gateway.storage.addPropertyMetadata(propertyName, "creator", Gateway.credentials.getAddress());
+        Database.getInstance().addPropertyMetadata(propertyName, "creator", Gateway.credentials.getAddress());
         return true;
     }
 }
